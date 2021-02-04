@@ -1,8 +1,3 @@
----
-title: ""
-tags: []
----
-
 ## MENGIRIM BANYAK SERTIFIKAT LANGSUNG DARI MICROSOFT WORD, EXCEL DAN OUTLOOK DENGAN VBA
 Download dulu file txt dari repository GitHub ini, lalu pada dokumen Word yang sudah diformat dengan mailing dari database Excel
 - [Tutorial 1](https://youtu.be/YszJte68Qu4)
