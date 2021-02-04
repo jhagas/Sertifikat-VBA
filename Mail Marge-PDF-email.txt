@@ -1,0 +1,77 @@
+'//Script pengiriman sertifikat webinar otomatis dengan akun Microsoft Outlook
+'//Jika terjadi error berarti proses mengirim email sudah selesai tapi belum tentu akan terkirim dengan segera
+'//Jika terjadi error maka pencet end
+
+Option Explicit
+
+'//sesuaikan path untuk menyimpan PDF
+Const FOLDER_SAVED As String = "Z:\Mount\Data\EXPO\Sertifikat\EXPO CAMPUS SMANESS 2021-"
+
+'//sesuaikan path menuju database excel anda
+Const SOURCE_FILE_PATH As String = "Z:\Mount\Data\EXPO\Sertifikat\Database Peserta Expo.xlsx"
+
+'mengatur variabel 
+Sub MailMergeToIndPDF()
+Dim MainDoc As Document, TargetDoc As Document
+Dim dbPath As String
+Dim recordNumber As Long, totalRecord As Long
+
+Dim objOutlook As Object
+Dim objMail As Object
+Dim emailTo As String
+Dim emailAttach As String
+Dim emailDear As String
+
+Set MainDoc = ActiveDocument
+With MainDoc.MailMerge
+    
+        '//ubah Sheet1$ menjadi nama sheet database excel kalian
+
+        .OpenDataSource Name:=SOURCE_FILE_PATH, sqlstatement:="SELECT * FROM [Sheet1$]"
+            
+        totalRecord = .DataSource.RecordCount
+
+        For recordNumber = 1 To totalRecord
+        
+            With .DataSource
+                .ActiveRecord = recordNumber
+                .FirstRecord = recordNumber
+                .LastRecord = recordNumber
+            End With
+            
+            .Destination = wdSendToNewDocument
+            .Execute False
+            
+            Set TargetDoc = ActiveDocument
+
+            '//sesuaikan dengan field yang akan dijadikan format penamaan
+            '//OUTPUT Saat ini = EXPO CAMPUS SMANESS 2021-Nama.pdf
+
+            TargetDoc.ExportAsFixedFormat FOLDER_SAVED & .DataSource.DataFields("Nama").Value & ".pdf", exportformat:=wdExportFormatPDF
+            TargetDoc.Close False
+            
+
+            '//Mengirim Email
+            
+            Set objOutlook = CreateObject("Outlook.Application")
+            Set objMail = objOutlook.CreateItem(0)
+            emailTo = .DataSource.DataFields("email").Value
+            emailAttach = FOLDER_SAVED & .DataSource.DataFields("Nama").Value & ".pdf"
+            emailDear = .DataSource.DataFields("Nama").Value
+             
+            objMail.to = emailTo
+            objMail.Subject = "Sertifikat Expo Campus 2021 SMA Negeri 1 Sumberrejo"
+            objMail.htmlbody = "Halo " & emailDear & "<br><br>Terimakasih atas partisipasi anda dalam acara Expo Campus SMA Negeri 1 Sumberrejo 2021.<br>Sertifikat anda telah terlampir pada surel ini dan dapat segera anda unduh untuk dipergunakan sebagaimana mestinya.<br>- Panitia Expo Campus SMA Negeri 1 Sumberrejo 2021<br>"
+            objMail.Attachments.Add emailAttach
+            objMail.Send
+    
+    Set objOutlook = Nothing
+    Set objMail = Nothing
+            
+            Set TargetDoc = Nothing
+        Next recordNumber
+End With
+    On Error Resume Next
+    On Error GoTo 0
+Set MainDoc = Nothing
+End Sub
