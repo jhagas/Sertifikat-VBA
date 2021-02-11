@@ -5,12 +5,12 @@
 Option Explicit
 
 '//sesuaikan path untuk menyimpan PDF
-Const FOLDER_SAVED As String = "Z:\Mount\Data\EXPO\Sertifikat\EXPO CAMPUS SMANESS 2021-"
+Const FOLDER_SAVED As String = "Z:\Mount\Data\EXPO\Sertifikat\Expo Campus 2021-"
 
 '//sesuaikan path menuju database excel anda
 Const SOURCE_FILE_PATH As String = "Z:\Mount\Data\EXPO\Sertifikat\Database Peserta Expo.xlsx"
 
-'mengatur variabel 
+'mengatur variabel
 Sub MailMergeToIndPDF()
 Dim MainDoc As Document, TargetDoc As Document
 Dim dbPath As String
@@ -21,6 +21,7 @@ Dim objMail As Object
 Dim emailTo As String
 Dim emailAttach As String
 Dim emailDear As String
+Dim link As String
 
 Set MainDoc = ActiveDocument
 With MainDoc.MailMerge
@@ -55,13 +56,14 @@ With MainDoc.MailMerge
             
             Set objOutlook = CreateObject("Outlook.Application")
             Set objMail = objOutlook.CreateItem(0)
-            emailTo = .DataSource.DataFields("email").Value
+            emailTo = .DataSource.DataFields("Email").Value
             emailAttach = FOLDER_SAVED & .DataSource.DataFields("Nama").Value & ".pdf"
             emailDear = .DataSource.DataFields("Nama").Value
+            link = "<a href=""https://drive.google.com/drive/folders/1926PSu2Pz13VH4da5zigiHmt5DOY8MLO?usp=sharing"" class=""inner-link-baca-juga"" target=""_self"">Klik Disini</a>"
              
             objMail.to = emailTo
             objMail.Subject = "Sertifikat Expo Campus 2021 SMA Negeri 1 Sumberrejo"
-            objMail.htmlbody = "Halo " & emailDear & "<br><br>Terimakasih atas partisipasi anda dalam acara Expo Campus SMA Negeri 1 Sumberrejo 2021.<br>Sertifikat anda telah terlampir pada surel ini dan dapat segera anda unduh untuk dipergunakan sebagaimana mestinya.<br>- Panitia Expo Campus SMA Negeri 1 Sumberrejo 2021<br>"
+            objMail.htmlbody = "Halo " & emailDear & "<br><b>Terimakasih atas partisipasi anda dalam acara Expo Campus SMA Negeri 1 Sumberrejo 2021.</b><br><br>Sertifikat anda telah terlampir pada surel ini dan dapat segera anda unduh untuk dipergunakan sebagaimana mestinya.<br>Jika terdapat kekeliruan, anda dapat mengakses link berikut ini :  " & link & "<br><br>- Panitia Expo Campus SMA Negeri 1 Sumberrejo 2021"
             objMail.Attachments.Add emailAttach
             objMail.Send
     
